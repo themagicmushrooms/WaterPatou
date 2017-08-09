@@ -5,10 +5,11 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.{Game, Gdx}
 import com.badlogic.gdx.graphics.{Color, GL20, PerspectiveCamera, Texture}
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
+import com.badlogic.gdx.graphics.g3d.attributes.{BlendingAttribute, ColorAttribute}
 import com.badlogic.gdx.graphics.g3d._
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.{CameraInputController, ModelBuilder}
+import com.badlogic.gdx.math.Plane
 
 class MyGame extends Game {
 
@@ -21,6 +22,9 @@ class MyGame extends Game {
   var modelInstance: ModelInstance = null
   var envir: Environment = null
 
+  var waterModel: Model = null
+  var waterInstance: ModelInstance = null
+
   override def create() = {
     batch = new SpriteBatch
     modelBatch = new ModelBatch
@@ -31,6 +35,18 @@ class MyGame extends Game {
       new Material(ColorAttribute.createDiffuse(Color.GREEN)),
       Usage.Position | Usage.Normal)
     modelInstance = new ModelInstance(model)
+    waterModel = builder.createRect (
+      -1f, 0f, -1f,
+      -1f, 0f, 1f,
+      1f, 0f, 1f,
+      1f, 0f, -1f,
+      0f, 1f, 0f,
+      new Material(
+        ColorAttribute.createDiffuse(Color.BLUE),
+        new BlendingAttribute(true, 0.2f)),
+      Usage.Position | Usage.Normal)
+    waterInstance = new ModelInstance(waterModel)
+    waterInstance.transform.scale(100f, 100f, 100f)
     envir = new Environment
     envir.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f))
     envir.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f))
@@ -60,6 +76,7 @@ class MyGame extends Game {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
     modelBatch.begin(cam)
     modelBatch.render(modelInstance, envir)
+    modelBatch.render(waterInstance, envir)
     modelBatch.end()
     camControl.update()
   }
