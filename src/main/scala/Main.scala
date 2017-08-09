@@ -9,32 +9,56 @@ import com.badlogic.gdx.graphics.g3d.attributes.{BlendingAttribute, ColorAttribu
 import com.badlogic.gdx.graphics.g3d._
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.{CameraInputController, ModelBuilder}
-import com.badlogic.gdx.math.Plane
+import com.badlogic.gdx.math.{Plane, Vector3}
+import com.badlogic.gdx.physics.bullet.Bullet
+import com.badlogic.gdx.physics.bullet.collision._
+import com.badlogic.gdx.physics.bullet.dynamics._
 
 class MyGame extends Game {
 
-  var batch: SpriteBatch = null
   var modelBatch: ModelBatch = null
-  var img: Texture = null
   var cam: PerspectiveCamera = null
   var camControl: CameraInputController = null
-  var model: Model = null
-  var modelInstance: ModelInstance = null
   var envir: Environment = null
+
+  var partModel: Model = null
+  var partModelInstance: ModelInstance = null
+  var partShape: btCollisionShape = null
+  var partBody: btRigidBody = null
+
+  var broadPhase: btBroadphaseInterface = null
+  var collisionConfig: btCollisionConfiguration = null
+  var dispatcher: btDispatcher = null
+  var world: btDynamicsWorld = null
+  var solver: btConstraintSolver = null
 
   var waterModel: Model = null
   var waterInstance: ModelInstance = null
 
   override def create() = {
-    batch = new SpriteBatch
+    Bullet.init()
+    broadPhase = new btDbvtBroadphase
+    collisionConfig = new btDefaultCollisionConfiguration
+    dispatcher = new btCollisionDispatcher(collisionConfig)
+    solver = new btSequentialImpulseConstraintSolver
+    world = new btDiscreteDynamicsWorld(dispatcher, broadPhase, solver, collisionConfig)
+    world.setGravity(new Vector3(0f, -10f, 0f))
+
     modelBatch = new ModelBatch
-    img = new Texture("data/badlogic.jpg")
     cam = createCam
+
     val builder = new ModelBuilder
-    model = builder.createBox(5f, 5f, 5f,
+    partModel = builder.createBox(5f, 5f, 5f,
       new Material(ColorAttribute.createDiffuse(Color.GREEN)),
       Usage.Position | Usage.Normal)
-    modelInstance = new ModelInstance(model)
+    partModelInstance = new ModelInstance(partModel)
+    partShape = new btBoxShape(new Vector3(2.5f, 2.5f, 2.5f))
+    val ci = new btRigidBody.btRigidBodyConstructionInfo(125f, null, partShape)
+    partBody = new btRigidBody(ci)
+    partBody.setCollisionShape(partShape)
+    partBody.setWorldTransform(partModelInstance.transform)
+    world.addRigidBody(partBody)
+
     waterModel = builder.createRect (
       -1f, 0f, -1f,
       -1f, 0f, 1f,
@@ -65,27 +89,24 @@ class MyGame extends Game {
   }
 
   override def render() = {
-    /*
-    Gdx.gl.glClearColor(1, 0, 0, 1)
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-    batch.begin()
-    batch.draw(img, 0, 0)
-    batch.end()
-    */
+
+    val delta = Math.min(1f / 30f, Gdx.graphics.getDeltaTime)
+    world.stepSimulation(delta, 5, 1f / 60f)
+
+    partBody.getWorldTransform(partModelInstance.transform)
+
     Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
     modelBatch.begin(cam)
-    modelBatch.render(modelInstance, envir)
+    modelBatch.render(partModelInstance, envir)
     modelBatch.render(waterInstance, envir)
     modelBatch.end()
     camControl.update()
   }
 
   override def dispose() = {
-    batch.dispose()
     modelBatch.dispose()
-    img.dispose()
-    model.dispose()
+    partModel.dispose()
   }
 
 }
