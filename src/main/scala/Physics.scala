@@ -10,13 +10,17 @@ import scala.collection.mutable.ArrayBuffer
 
 class Physics extends Disposable {
 
+  var gravity = new Vector3(0f, 0f, -9.81f)
+  val waterDensity = 1f
+  val woodDensity = 0.5f
+
   Bullet.init()
   var broadPhase = new btDbvtBroadphase
   var collisionConfig = new btDefaultCollisionConfiguration
   var dispatcher = new btCollisionDispatcher(collisionConfig)
   var solver = new btSequentialImpulseConstraintSolver
   var world = new btDiscreteDynamicsWorld(dispatcher, broadPhase, solver, collisionConfig)
-  world.setGravity(new Vector3(0f, 0f, -9.81f))
+  world.setGravity(gravity)
 
   private val bodies = ArrayBuffer.empty[btRigidBody]
 
@@ -27,7 +31,10 @@ class Physics extends Disposable {
 
   def step(delta: Float) = {
     world.stepSimulation(delta, 5, 1f / 60f)
-    bodies.filter(isUnderwater).foreach(applyArchimedes)
+    for (body <- bodies.filter(isUnderwater)) {
+      applyArchimedes(body)
+      applyDrag(body)
+    }
   }
 
   def isUnderwater(body: btRigidBody) = {
@@ -37,7 +44,29 @@ class Physics extends Disposable {
   }
 
   def applyArchimedes(body: btRigidBody) = {
-    body.applyCentralForce(new Vector3(0f, 0f, 2000f))
+    val push = gravity.cpy().scl(-1f * waterDensity * volume(body))
+    body.applyCentralForce(push)
+  }
+
+  def applyDrag(body: btRigidBody) = {
+    val coef = surface(body)
+    val speed = body.getLinearVelocity.len
+    val drag = body.getLinearVelocity.cpy().scl(speed).scl(-1f * waterDensity * coef)
+    body.applyCentralForce(drag)
+  }
+
+  def volume(body: btRigidBody) = { // approximation
+    val from = new Vector3
+    val to = new Vector3
+    body.getAabb(from, to)
+    Math.abs((from.x - to.x) * (from.y - to.y) * (from.z - to.z))
+  }
+
+  def surface(body: btRigidBody) = { // approximation
+    val from = new Vector3
+    val to = new Vector3
+    body.getAabb(from, to)
+    Math.abs((from.x - to.x) * (from.y - to.y))
   }
 
   override def dispose() = {

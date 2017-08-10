@@ -39,9 +39,11 @@ class MyGame extends Game {
       new Material(ColorAttribute.createDiffuse(Color.GREEN)),
       Usage.Position | Usage.Normal)
     partModelInstance = new ModelInstance(partModel)
-    partModelInstance.transform.translate(0f, 0f, 12f)
+    partModelInstance.transform.translate(0f, 0f, 20f)
     partShape = new btBoxShape(new Vector3(2.5f, 2.5f, 2.5f))
-    val ci = new btRigidBody.btRigidBodyConstructionInfo(125f, null, partShape)
+    val volume = 125f
+    val mass = physics.woodDensity * volume
+    val ci = new btRigidBody.btRigidBodyConstructionInfo(mass, null, partShape)
     partBody = new btRigidBody(ci)
     partBody.setCollisionShape(partShape)
     partBody.setWorldTransform(partModelInstance.transform)
@@ -68,7 +70,7 @@ class MyGame extends Game {
 
   private def createCam = {
     val cam = new PerspectiveCamera(90, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
-    cam.position.set(10f, 10f, 10f)
+    cam.position.set(20f, 20f, 20f)
     cam.lookAt(0f, 0f, 0f)
     cam.up.set(0f, 0f, 1f)
     cam.near = 1f
