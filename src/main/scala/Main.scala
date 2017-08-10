@@ -12,6 +12,8 @@ import com.badlogic.gdx.math.{Plane, Vector3}
 import com.badlogic.gdx.physics.bullet.collision._
 import com.badlogic.gdx.physics.bullet.dynamics._
 
+import scala.collection.mutable.ArrayBuffer
+
 class MyGame extends Game {
 
   var modelBatch: ModelBatch = null
@@ -19,36 +21,35 @@ class MyGame extends Game {
   var camControl: CameraInputController = null
   var envir: Environment = null
 
-  var partModel: Model = null
-  var partModelInstance: ModelInstance = null
-  var partShape: btCollisionShape = null
-  var partBody: btRigidBody = null
+  var mainPart: CubePart = null
+  var otherParts = ArrayBuffer.empty[CubePart]
 
   var physics: Physics = null
 
   var waterModel: Model = null
   var waterInstance: ModelInstance = null
 
+  def addPart = {
+    val size = Math.random().toFloat * 10f
+    val col = new Color(Math.random().toFloat, Math.random().toFloat, Math.random().toFloat, 1f)
+    val part = new CubePart(physics, size, col)
+    val range = 40f
+    part.move(Math.random().toFloat * range * 2f - range, Math.random().toFloat * range * 2f - range, Math.random().toFloat * range)
+    otherParts.append(part)
+  }
+
   override def create() = {
     physics = new Physics
     modelBatch = new ModelBatch
     cam = createCam
 
-    val builder = new ModelBuilder
-    partModel = builder.createBox(5f, 5f, 5f,
-      new Material(ColorAttribute.createDiffuse(Color.GREEN)),
-      Usage.Position | Usage.Normal)
-    partModelInstance = new ModelInstance(partModel)
-    partModelInstance.transform.translate(0f, 0f, 20f)
-    partShape = new btBoxShape(new Vector3(2.5f, 2.5f, 2.5f))
-    val volume = 125f
-    val mass = physics.woodDensity * volume
-    val ci = new btRigidBody.btRigidBodyConstructionInfo(mass, null, partShape)
-    partBody = new btRigidBody(ci)
-    partBody.setCollisionShape(partShape)
-    partBody.setWorldTransform(partModelInstance.transform)
-    physics.add(partBody)
+    mainPart = new CubePart(physics, 5f, Color.GREEN)
+    mainPart.move(0f, 0f, 20f)
 
+    for (i <- 0 to 30)
+      addPart
+
+    val builder = new ModelBuilder
     waterModel = builder.createRect (
       -1f, -1f, 0f,
       1f, -1f, 0f,
@@ -84,12 +85,14 @@ class MyGame extends Game {
     val delta = Math.min(1f / 30f, Gdx.graphics.getDeltaTime)
     physics.step(delta)
 
-    partBody.getWorldTransform(partModelInstance.transform)
+    mainPart.update()
+    otherParts.foreach(_.update())
 
     Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
     modelBatch.begin(cam)
-    modelBatch.render(partModelInstance, envir)
+    modelBatch.render(mainPart.instance, envir)
+    otherParts.foreach(p => modelBatch.render(p.instance, envir))
     modelBatch.render(waterInstance, envir)
     modelBatch.end()
     camControl.update()
@@ -97,7 +100,8 @@ class MyGame extends Game {
 
   override def dispose() = {
     modelBatch.dispose()
-    partModel.dispose()
+    mainPart.dispose()
+    otherParts.foreach(_.dispose())
   }
 
 }
