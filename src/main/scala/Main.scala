@@ -39,7 +39,7 @@ class MyGame extends Game {
       new Material(ColorAttribute.createDiffuse(Color.GREEN)),
       Usage.Position | Usage.Normal)
     partModelInstance = new ModelInstance(partModel)
-    partModelInstance.transform.translate(0f, 12f, 0f)
+    partModelInstance.transform.translate(0f, 0f, 12f)
     partShape = new btBoxShape(new Vector3(2.5f, 2.5f, 2.5f))
     val ci = new btRigidBody.btRigidBodyConstructionInfo(125f, null, partShape)
     partBody = new btRigidBody(ci)
@@ -48,11 +48,11 @@ class MyGame extends Game {
     physics.add(partBody)
 
     waterModel = builder.createRect (
-      -1f, 0f, -1f,
-      -1f, 0f, 1f,
-      1f, 0f, 1f,
-      1f, 0f, -1f,
-      0f, 1f, 0f,
+      -1f, -1f, 0f,
+      1f, -1f, 0f,
+      1f, 1f, 0f,
+      -1f, 1f, 0f,
+      0f, 0f, 1f,
       new Material(
         ColorAttribute.createDiffuse(Color.BLUE),
         new BlendingAttribute(true, 0.6f)),
@@ -70,6 +70,7 @@ class MyGame extends Game {
     val cam = new PerspectiveCamera(90, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
     cam.position.set(10f, 10f, 10f)
     cam.lookAt(0f, 0f, 0f)
+    cam.up.set(0f, 0f, 1f)
     cam.near = 1f
     cam.far = 300f
     cam.update()

@@ -16,7 +16,7 @@ class Physics extends Disposable {
   var dispatcher = new btCollisionDispatcher(collisionConfig)
   var solver = new btSequentialImpulseConstraintSolver
   var world = new btDiscreteDynamicsWorld(dispatcher, broadPhase, solver, collisionConfig)
-  world.setGravity(new Vector3(0f, -10f, 0f))
+  world.setGravity(new Vector3(0f, 0f, -9.81f))
 
   private val bodies = ArrayBuffer.empty[btRigidBody]
 
@@ -33,11 +33,11 @@ class Physics extends Disposable {
   def isUnderwater(body: btRigidBody) = {
     val v = new Vector3
     body.getWorldTransform.getTranslation(v)
-    v.y < 0f
+    v.z < 0f
   }
 
   def applyArchimedes(body: btRigidBody) = {
-    body.applyCentralForce(new Vector3(0f, 2000f, 0f))
+    body.applyCentralForce(new Vector3(0f, 0f, 2000f))
   }
 
   override def dispose() = {
