@@ -24,7 +24,7 @@ class CubePart(physics: Physics, size: Float, color: Color) extends  Disposable 
   val ci = new btRigidBody.btRigidBodyConstructionInfo(mass, null, physicsShape, inertia)
   val body = new btRigidBody(ci)
   body.setCollisionShape(physicsShape)
-  body.setDamping(0.02f, 0.04f)
+  body.setDamping(0.2f, 0.4f)
   physics.add(body)
   sync3dToPhysics
 

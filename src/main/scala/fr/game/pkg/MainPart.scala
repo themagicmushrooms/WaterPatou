@@ -14,19 +14,19 @@ class MainPart(physics: Physics, size: Float, color: Color) extends CubePart(phy
 
   private def applyTurbineForces = {
     if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-      longitudinalPush(10f)
+      longitudinalPush(20f)
     } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-      longitudinalPush(-5f)
+      longitudinalPush(-10f)
     }
     if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-      spin(1f)
+      spin(10f)
     } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-      spin(-1f)
+      spin(-10f)
     }
     if (Gdx.input.isKeyPressed(Input.Keys.PAGE_UP)) {
-      verticalPush(10f)
+      verticalPush(20f)
     } else if (Gdx.input.isKeyPressed(Input.Keys.PAGE_DOWN)) {
-      verticalPush(-10f)
+      verticalPush(-20f)
     }
   }
 
