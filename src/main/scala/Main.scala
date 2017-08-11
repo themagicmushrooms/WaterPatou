@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.{BlendingAttribute, ColorAttribu
 import com.badlogic.gdx.graphics.g3d._
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.{CameraInputController, ModelBuilder}
+import com.badlogic.gdx.math.Vector3
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -83,6 +84,10 @@ class MyGame extends Game {
     physics.step(delta)
 
     parts.foreach(_.update())
+    val pos = new Vector3
+    parts(0).instance.transform.getTranslation(pos)
+    cam.lookAt(pos)
+    cam.update()
 
     Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
