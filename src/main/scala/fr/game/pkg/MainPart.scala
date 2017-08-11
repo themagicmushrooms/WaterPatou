@@ -17,11 +17,13 @@ class MainPart(physics: Physics, size: Float, color: Color) extends CubePart(phy
       longitudinalPush(10f)
     } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
       longitudinalPush(-5f)
-    } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+    }
+    if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
       spin(1f)
     } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
       spin(-1f)
-    } else if (Gdx.input.isKeyPressed(Input.Keys.PAGE_UP)) {
+    }
+    if (Gdx.input.isKeyPressed(Input.Keys.PAGE_UP)) {
       verticalPush(10f)
     } else if (Gdx.input.isKeyPressed(Input.Keys.PAGE_DOWN)) {
       verticalPush(-10f)
