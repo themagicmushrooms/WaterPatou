@@ -2,15 +2,12 @@ package fr.game.pkg
 
 import com.badlogic.gdx.backends.lwjgl._
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
-import com.badlogic.gdx.{Game, Gdx}
-import com.badlogic.gdx.graphics.{Color, GL20, PerspectiveCamera, Texture}
+import com.badlogic.gdx.{Game, Gdx, Input}
+import com.badlogic.gdx.graphics.{Color, GL20, PerspectiveCamera}
 import com.badlogic.gdx.graphics.g3d.attributes.{BlendingAttribute, ColorAttribute}
 import com.badlogic.gdx.graphics.g3d._
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.{CameraInputController, ModelBuilder}
-import com.badlogic.gdx.math.{Plane, Vector3}
-import com.badlogic.gdx.physics.bullet.collision._
-import com.badlogic.gdx.physics.bullet.dynamics._
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -21,21 +18,20 @@ class MyGame extends Game {
   var camControl: CameraInputController = null
   var envir: Environment = null
 
-  var mainPart: CubePart = null
-  var otherParts = ArrayBuffer.empty[CubePart]
+  var parts = ArrayBuffer.empty[CubePart]
 
   var physics: Physics = null
 
   var waterModel: Model = null
   var waterInstance: ModelInstance = null
 
-  def addPart = {
+  def addDumbPart = {
     val size = Math.random().toFloat * 10f
     val col = new Color(Math.random().toFloat, Math.random().toFloat, Math.random().toFloat, 1f)
     val part = new CubePart(physics, size, col)
     val range = 40f
     part.move(Math.random().toFloat * range * 2f - range, Math.random().toFloat * range * 2f - range, Math.random().toFloat * range)
-    otherParts.append(part)
+    parts.append(part)
   }
 
   override def create() = {
@@ -43,11 +39,12 @@ class MyGame extends Game {
     modelBatch = new ModelBatch
     cam = createCam
 
-    mainPart = new CubePart(physics, 5f, Color.GREEN)
+    val mainPart = new MainPart(physics, 5f, Color.GREEN)
     mainPart.move(0f, 0f, 20f)
+    parts.append(mainPart)
 
     for (i <- 0 to 30)
-      addPart
+      addDumbPart
 
     val builder = new ModelBuilder
     waterModel = builder.createRect (
@@ -85,30 +82,32 @@ class MyGame extends Game {
     val delta = Math.min(1f / 30f, Gdx.graphics.getDeltaTime)
     physics.step(delta)
 
-    mainPart.update()
-    otherParts.foreach(_.update())
+    parts.foreach(_.update())
 
     Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT)
     modelBatch.begin(cam)
-    modelBatch.render(mainPart.instance, envir)
-    otherParts.foreach(p => modelBatch.render(p.instance, envir))
+    parts.foreach(p => modelBatch.render(p.instance, envir))
     modelBatch.render(waterInstance, envir)
     modelBatch.end()
     camControl.update()
+
+    if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+      Gdx.app.exit()
+    }
+
   }
 
   override def dispose() = {
     modelBatch.dispose()
-    mainPart.dispose()
-    otherParts.foreach(_.dispose())
+    parts.foreach(_.dispose())
   }
 
 }
 
 object Main extends App {
   val cfg = new LwjglApplicationConfiguration
-  cfg.title = "My Game"
+  cfg.title = "Water Patou"
   cfg.height = 480
   cfg.width = 800
   cfg.forceExit = false

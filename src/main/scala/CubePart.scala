@@ -20,13 +20,19 @@ class CubePart(physics: Physics, size: Float, color: Color) extends  Disposable 
   var physicsShape = new btBoxShape(new Vector3(size / 2f, size / 2f, size / 2f))
   val volume = size * size * size
   val mass = physics.woodDensity * volume
-  var inertia = new Vector3
-  physicsShape.calculateLocalInertia(mass, inertia)
+  var inertia = calculateInertia
   val ci = new btRigidBody.btRigidBodyConstructionInfo(mass, null, physicsShape, inertia)
   val body = new btRigidBody(ci)
   body.setCollisionShape(physicsShape)
+  body.setDamping(0.02f, 0.04f)
   physics.add(body)
   sync3dToPhysics
+
+  protected def calculateInertia = {
+    val i = new Vector3
+    physicsShape.calculateLocalInertia(mass, i)
+    i
+  }
 
   private def syncPhysicsTo3d = {
     body.getWorldTransform(instance.transform)
@@ -46,6 +52,7 @@ class CubePart(physics: Physics, size: Float, color: Color) extends  Disposable 
   }
 
   override def dispose() = {
-    // TODO
+    model.dispose()
   }
+
 }
