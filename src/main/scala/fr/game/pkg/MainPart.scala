@@ -8,6 +8,11 @@ class MainPart(physics: Physics, size: Float, color: Color) extends CubePart(phy
 
   override def update() = {
     super.update()
+    if (physics.isUnderwater(body))
+      applyTurbineForces
+  }
+
+  private def applyTurbineForces = {
     if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
       longitudinalPush(10f)
     } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
@@ -16,6 +21,10 @@ class MainPart(physics: Physics, size: Float, color: Color) extends CubePart(phy
       spin(1f)
     } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
       spin(-1f)
+    } else if (Gdx.input.isKeyPressed(Input.Keys.PAGE_UP)) {
+      verticalPush(10f)
+    } else if (Gdx.input.isKeyPressed(Input.Keys.PAGE_DOWN)) {
+      verticalPush(-10f)
     }
   }
 
@@ -24,8 +33,14 @@ class MainPart(physics: Physics, size: Float, color: Color) extends CubePart(phy
     val dir = new Vector3(1f, 0f, 0f)
     val q = new Quaternion
     body.getWorldTransform().getRotation(q)
-    dir.mul(q).nor().scl(intensity)
-    body.applyCentralForce(dir)
+    dir.mul(q).nor()
+    body.applyCentralForce(dir.scl(intensity))
+  }
+
+  private def verticalPush(force: Float) = {
+    val intensity = mass * force
+    val dir = new Vector3(0f, 0f, 1f)
+    body.applyCentralForce(dir.scl(intensity))
   }
 
   private def spin(force: Float) = {
@@ -40,5 +55,7 @@ class MainPart(physics: Physics, size: Float, color: Color) extends CubePart(phy
     i.y = 0f
     i
   }
+
+  override def density: Float = physics.heavyWoodDensity
 
 }

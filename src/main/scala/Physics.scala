@@ -13,6 +13,7 @@ class Physics extends Disposable {
   var gravity = new Vector3(0f, 0f, -9.81f)
   val waterDensity = 1f
   val woodDensity = 0.5f
+  val heavyWoodDensity = 0.9f
 
   Bullet.init()
   var broadPhase = new btDbvtBroadphase

@@ -19,7 +19,7 @@ class CubePart(physics: Physics, size: Float, color: Color) extends  Disposable 
   var instance = new ModelInstance(model)
   var physicsShape = new btBoxShape(new Vector3(size / 2f, size / 2f, size / 2f))
   val volume = size * size * size
-  val mass = physics.woodDensity * volume
+  val mass = volume * density
   var inertia = calculateInertia
   val ci = new btRigidBody.btRigidBodyConstructionInfo(mass, null, physicsShape, inertia)
   val body = new btRigidBody(ci)
@@ -46,6 +46,8 @@ class CubePart(physics: Physics, size: Float, color: Color) extends  Disposable 
     instance.transform.translate(x, y, z)
     sync3dToPhysics
   }
+
+  def density = physics.woodDensity
 
   def update() = {
     syncPhysicsTo3d
