@@ -4,6 +4,7 @@ import com.badlogic.gdx.{Gdx, Input}
 import com.badlogic.gdx.graphics.{Color, GL20}
 import com.badlogic.gdx.graphics.VertexAttributes.Usage
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
+import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.{BoxShapeBuilder, CapsuleShapeBuilder, SphereShapeBuilder}
 import com.badlogic.gdx.graphics.g3d.{Material, ModelInstance}
 import com.badlogic.gdx.math.{Quaternion, Vector3}
 
@@ -11,19 +12,19 @@ class MainPart(physics: Physics, size: Float, color: Color) extends CubePart(phy
 
   builder.begin
   val mainNode = builder.node()
-  builder
-    .part("main", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(color)))
-      .box(size, size, size)
+  BoxShapeBuilder.build(
+    builder.part("main", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(color))),
+    size, size, size)
   val left = builder.node()
   left.translation.set(size * 0.25f, size * 0.25f, size / 2)
-  builder
-    .part("left", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(color)))
-    .sphere(size / 2, size / 2, size / 2, 32, 32, 0f, 180f, 0f, 180f)
+  SphereShapeBuilder.build(
+    builder.part("left", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(color))),
+    size / 2, size / 2, size / 2, 32, 32, 0f, 180f, 0f, 180f)
   val right = builder.node()
   right.translation.set(size * 0.25f, -size * 0.25f, size / 2)
-  builder
-    .part("right", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(color)))
-    .sphere(size / 2, size / 2, size / 2, 32, 32, 0f, 180f, 0f, 180f)
+  SphereShapeBuilder.build(
+    builder.part("right", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(color))),
+    size / 2, size / 2, size / 2, 32, 32, 0f, 180f, 0f, 180f)
   model = builder.end
   instance = new ModelInstance(model)
 
