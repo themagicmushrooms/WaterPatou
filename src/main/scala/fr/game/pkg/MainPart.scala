@@ -16,15 +16,17 @@ class MainPart(physics: Physics, size: Float, color: Color) extends CubePart(phy
     builder.part("main", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(color))),
     size, size, size)
   val left = builder.node()
+  left.rotation.set(new Vector3(1f, 0f, 0f), 80f)
   left.translation.set(size * 0.25f, size * 0.25f, size / 2)
-  SphereShapeBuilder.build(
+  CapsuleShapeBuilder.build(
     builder.part("left", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(color))),
-    size / 2, size / 2, size / 2, 32, 32, 0f, 180f, 0f, 180f)
+    size / 6, size, 15)
   val right = builder.node()
+  right.rotation.set(new Vector3(-1f, 0f, 0f), 80f)
   right.translation.set(size * 0.25f, -size * 0.25f, size / 2)
-  SphereShapeBuilder.build(
+  CapsuleShapeBuilder.build(
     builder.part("right", GL20.GL_TRIANGLES, Usage.Position | Usage.Normal, new Material(ColorAttribute.createDiffuse(color))),
-    size / 2, size / 2, size / 2, 32, 32, 0f, 180f, 0f, 180f)
+    size / 6, size, 15)
   model = builder.end
   instance = new ModelInstance(model)
 
