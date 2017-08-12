@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g3d._
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.{CameraInputController, ModelBuilder}
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.physics.bullet.dynamics.btJointFeedback
 
 import scala.collection.mutable.ArrayBuffer
 

@@ -28,6 +28,7 @@ class Physics extends Disposable {
   def add(body: btRigidBody) {
     world.addRigidBody(body)
     bodies.append(body)
+
   }
 
   def step(delta: Float) = {

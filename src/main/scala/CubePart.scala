@@ -12,7 +12,7 @@ import com.sun.media.jfxmediaimpl.MediaDisposer.Disposable
 
 class CubePart(physics: Physics, size: Float, color: Color) extends  Disposable {
 
-  private val builder = new ModelBuilder
+  protected val builder = new ModelBuilder
   var model = builder.createBox(size, size, size,
     new Material(ColorAttribute.createDiffuse(color)),
     Usage.Position | Usage.Normal)
