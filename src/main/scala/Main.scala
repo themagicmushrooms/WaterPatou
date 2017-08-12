@@ -26,13 +26,13 @@ class MyGame extends Game {
   var waterModel: Model = null
   var waterInstance: ModelInstance = null
 
-  def addDumbPart = {
+  def createDumbPart = {
     val size = Math.random().toFloat * 10f
     val col = new Color(Math.random().toFloat, Math.random().toFloat, Math.random().toFloat, 1f)
     val part = new CubePart(physics, size, col)
     val range = 40f
     part.move(Math.random().toFloat * range * 2f - range, Math.random().toFloat * range * 2f - range, Math.random().toFloat * range)
-    parts.append(part)
+    part
   }
 
   override def create() = {
@@ -45,7 +45,7 @@ class MyGame extends Game {
     parts.append(mainPart)
 
     for (i <- 0 to 30)
-      addDumbPart
+      parts.append(createDumbPart)
 
     val builder = new ModelBuilder
     waterModel = builder.createRect (
@@ -60,6 +60,7 @@ class MyGame extends Game {
       Usage.Position | Usage.Normal)
     waterInstance = new ModelInstance(waterModel)
     waterInstance.transform.scale(100f, 100f, 100f)
+
     envir = new Environment
     envir.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f))
     envir.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f))
