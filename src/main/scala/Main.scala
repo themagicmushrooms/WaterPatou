@@ -89,6 +89,13 @@ class MyGame extends Game {
     val pos = new Vector3
     parts(0).instance.transform.getTranslation(pos)
     cam.lookAt(pos)
+    val camDist = pos.cpy().sub(cam.position)
+    val followAt = 40f
+    if (camDist.len() > followAt) {
+      val l = camDist.len()
+      val deltaV = camDist.scl((1-Math.pow(0.05f, delta)).toFloat*(l-followAt)/l)
+      cam.translate(deltaV)
+    }
     cam.update()
 
     Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
