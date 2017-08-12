@@ -40,7 +40,7 @@ class MyGame extends Game {
     modelBatch = new ModelBatch
     cam = createCam
 
-    val mainPart = new MainPart(physics, 5f, Color.GREEN)
+    val mainPart = new MainPart(physics, 5f, Color.WHITE)
     mainPart.move(0f, 0f, 20f)
     parts.append(mainPart)
 
